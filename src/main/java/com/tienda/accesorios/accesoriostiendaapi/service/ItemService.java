@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 
 @Service
 public class ItemService {
@@ -39,5 +40,9 @@ public class ItemService {
 
     public Item agregarItem(Item item) {
         return itemRepository.save(item);
+    }
+
+    public List<Item> getAllItems() {
+        return itemRepository.findAll();
     }
 }

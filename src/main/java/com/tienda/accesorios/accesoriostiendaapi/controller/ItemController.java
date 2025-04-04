@@ -8,6 +8,7 @@ import com.tienda.accesorios.accesoriostiendaapi.model.Item;
 import com.tienda.accesorios.accesoriostiendaapi.model.ItemAdditionalExpense;
 import com.tienda.accesorios.accesoriostiendaapi.repository.AdditionalExpenseRepository;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpenseRepository;
+import com.tienda.accesorios.accesoriostiendaapi.service.ItemService;
 import org.springframework.web.bind.annotation.*;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,11 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/items")
+@RequestMapping("/api/items")
 public class ItemController {
+
+    @Autowired
+    private ItemService itemService;
 
     @Autowired
     private ItemRepository itemRepository;
@@ -86,7 +90,7 @@ public class ItemController {
         }
     }
     @GetMapping("/{id}/gastos-adicionales")
-    public List<AdditionalExpenseDTO> obtenerGastosPorItem(@PathVariable Integer id) {
+    public List<AdditionalExpenseDTO> obtenerGastosPorItem(@PathVariable String id) {
         List<ItemAdditionalExpense> relaciones = itemAdditionalExpenseRepository.findByItemId(id);
 
         return relaciones.stream()
@@ -100,5 +104,10 @@ public class ItemController {
                     );
                 })
                 .toList();
+    }
+
+    @GetMapping
+    public List<Item> getAllItems() {
+        return itemService.getAllItems();
     }
 }
