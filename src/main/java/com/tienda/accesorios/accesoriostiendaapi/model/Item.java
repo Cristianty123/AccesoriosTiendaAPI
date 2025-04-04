@@ -2,7 +2,7 @@ package com.tienda.accesorios.accesoriostiendaapi.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Item")
+@Table(name = "item")
 public class Item {
 
     @Id
@@ -21,7 +21,7 @@ public class Item {
     private Double purchasePrice;
     private Boolean itemState;
     @Lob
-    @Column(name = "image") // <--- esto asegura que se mapea al campo 'image'
+    @Column(name = "image",columnDefinition = "bytea") // <--- esto asegura que se mapea al campo 'image'
     private byte[] image;
 
     @ManyToOne
@@ -65,7 +65,7 @@ public class Item {
     public void setItemState(Boolean itemState) { this.itemState = itemState; }
 
     public byte[] getImage() { return image; }
-    public void setPicture(byte[] image) { this.image = image; }
+    public void setImage(byte[] image) { this.image = image; }
 
     public ItemType getItemType() { return itemType; }
     public void setItemType(ItemType itemType) { this.itemType = itemType; }

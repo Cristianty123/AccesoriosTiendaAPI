@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ItemAdditionalExpenseRepository extends JpaRepository<ItemAdditionalExpense, ItemAdditionalExpenseId>  {
-    List<ItemAdditionalExpense> findByItemId(Integer itemId);
+    List<ItemAdditionalExpense> findByItemId(String itemId);
 }

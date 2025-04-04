@@ -3,7 +3,7 @@ package com.tienda.accesorios.accesoriostiendaapi.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "AdditionalExpense")
+@Table(name = "additionalexpense")
 public class AdditionalExpense {
 
     @Id

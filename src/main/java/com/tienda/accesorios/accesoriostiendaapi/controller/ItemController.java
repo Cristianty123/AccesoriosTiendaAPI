@@ -1,6 +1,6 @@
 package com.tienda.accesorios.accesoriostiendaapi.controller;
 
-import com.tienda.accesorios.accesoriostiendaapi.dto.AdditionalExpenseDTO;
+import com.tienda.accesorios.accesoriostiendaapi.dto.AdditionalExpenseResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemRequest;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
 import com.tienda.accesorios.accesoriostiendaapi.model.AdditionalExpense;
@@ -86,13 +86,13 @@ public class ItemController {
         }
     }
     @GetMapping("/{id}/gastos-adicionales")
-    public List<AdditionalExpenseDTO> obtenerGastosPorItem(@PathVariable Integer id) {
+    public List<AdditionalExpenseResponse> obtenerGastosPorItem(@PathVariable String id) {
         List<ItemAdditionalExpense> relaciones = itemAdditionalExpenseRepository.findByItemId(id);
 
         return relaciones.stream()
                 .map(rel -> {
                     AdditionalExpense gasto = rel.getAdditionalExpense();
-                    return new AdditionalExpenseDTO(
+                    return new AdditionalExpenseResponse(
                             gasto.getId(),
                             gasto.getName(),
                             gasto.getExpense(),

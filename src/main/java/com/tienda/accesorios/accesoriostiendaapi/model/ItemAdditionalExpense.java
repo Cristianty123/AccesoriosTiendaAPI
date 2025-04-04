@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "Item_AdditionalExpense")
+@Table(name = "item_additionalexpense")
 public class ItemAdditionalExpense implements Serializable {
 
     @EmbeddedId
