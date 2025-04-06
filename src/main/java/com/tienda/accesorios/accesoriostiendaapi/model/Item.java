@@ -17,29 +17,29 @@ public class Item {
     @Column(nullable = false)
     private int stock;
 
-    private Double sellingPrice;
-    private Double purchasePrice;
-    private Boolean itemState;
-    @Lob
-    @Column(name = "image",columnDefinition = "bytea") // <--- esto asegura que se mapea al campo 'image'
-    private byte[] image;
+    private Double sellingprice;
+    private Double purchaseprice;
+    private Boolean itemstate;
+
+    @Column(name = "imageurl")
+    private String imageurl;
 
     @ManyToOne
-    @JoinColumn(name = "itemType", referencedColumnName = "id")
-    private ItemType itemType;
+    @JoinColumn(name = "itemtype", referencedColumnName = "id")
+    private ItemType itemtype;
 
     public Item() {}
 
-    public Item(String id, String name, String description, int stock, Double sellingPrice, Double purchasePrice, Boolean itemState, byte[] image, ItemType itemType) {
+    public Item(String id, String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, String imageurl, ItemType itemtype) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.stock = stock;
-        this.sellingPrice = sellingPrice;
-        this.purchasePrice = purchasePrice;
-        this.itemState = itemState;
-        this.image = image;
-        this.itemType = itemType;
+        this.sellingprice = sellingprice;
+        this.purchaseprice = purchaseprice;
+        this.itemstate = itemstate;
+        this.imageurl = imageurl;
+        this.itemtype = itemtype;
     }
 
     // Getters y Setters
@@ -55,18 +55,18 @@ public class Item {
     public int getStock() { return stock; }
     public void setStock(int stock) { this.stock = stock; }
 
-    public Double getSellingPrice() { return sellingPrice; }
-    public void setSellingPrice(Double sellingPrice) { this.sellingPrice = sellingPrice; }
+    public Double getSellingprice() { return sellingprice; }
+    public void setSellingprice(Double sellingPrice) { this.sellingprice = sellingPrice; }
 
-    public Double getPurchasePrice() { return purchasePrice; }
-    public void setPurchasePrice(Double purchasePrice) { this.purchasePrice = purchasePrice; }
+    public Double getPurchaseprice() { return purchaseprice; }
+    public void setPurchaseprice(Double purchasePrice) { this.purchaseprice = purchasePrice; }
 
-    public Boolean getItemState() { return itemState; }
-    public void setItemState(Boolean itemState) { this.itemState = itemState; }
+    public Boolean getItemstate() { return itemstate; }
+    public void setItemstate(Boolean itemState) { this.itemstate = itemState; }
 
-    public byte[] getImage() { return image; }
-    public void setImage(byte[] image) { this.image = image; }
+    public String getimageUrl() { return imageurl; }
+    public void setimageUrl(String imageUrl) { this.imageurl = imageUrl; }
 
-    public ItemType getItemType() { return itemType; }
-    public void setItemType(ItemType itemType) { this.itemType = itemType; }
+    public ItemType getItemtype() { return itemtype; }
+    public void setItemtype(ItemType itemType) { this.itemtype = itemType; }
 }

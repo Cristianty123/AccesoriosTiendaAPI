@@ -7,22 +7,22 @@ public class ItemResponse {
     private String name;
     private String description;
     private int stock;
-    private Double sellingPrice;
-    private Double purchasePrice;
-    private Boolean itemState;
-    private ItemType itemType;
-    private String image;  // Imagen en Base64
+    private Double sellingprice;
+    private Double purchaseprice;
+    private Boolean itemstate;
+    private ItemType itemtype;
+    private String imageurl;
 
-    public ItemResponse(String id, String name, String description, int stock, Double sellingPrice, Double purchasePrice, Boolean itemState,ItemType itemType,  String picture) {
+    public ItemResponse(String id, String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, String imageurl) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.stock = stock;
-        this.sellingPrice = sellingPrice;
-        this.purchasePrice = purchasePrice;
-        this.itemState = itemState;
-        this.itemType = itemType;
-        this.image = picture;
+        this.sellingprice = sellingprice;
+        this.purchaseprice = purchaseprice;
+        this.itemstate = itemstate;
+        this.itemtype = itemtype;
+        this.imageurl = imageurl;
     }
 
     public String getId() { return id; }
@@ -37,18 +37,18 @@ public class ItemResponse {
     public int getStock() { return stock; }
     public void setStock(int stock) { this.stock = stock; }
 
-    public Double getSellingPrice() { return sellingPrice; }
-    public void setSellingPrice(Double sellingPrice) { this.sellingPrice = sellingPrice; }
+    public Double getSellingprice() { return sellingprice; }
+    public void setSellingprice(Double sellingprice) { this.sellingprice = sellingprice; }
 
-    public Double getPurchasePrice() { return purchasePrice; }
-    public void setPurchasePrice(Double purchasePrice) { this.purchasePrice = purchasePrice; }
+    public Double getPurchaseprice() { return purchaseprice; }
+    public void setPurchaseprice(Double purchaseprice) { this.purchaseprice = purchaseprice; }
 
-    public Boolean getItemState() { return itemState; }
-    public void setItemState(Boolean itemState) { this.itemState = itemState; }
+    public Boolean getItemstate() { return itemstate; }
+    public void setItemstate(Boolean itemstate) { this.itemstate = itemstate; }
 
-    public ItemType getItemType() { return itemType; }
-    public void setItemType(ItemType itemType) { this.itemType = itemType; }
+    public ItemType getItemtype() { return itemtype; }
+    public void setItemtype(ItemType itemtype) { this.itemtype = itemtype; }
 
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
+    public String getImageurl() { return imageurl; }
+    public void setImageurl(String imageurl) { this.imageurl = imageurl; }
 }

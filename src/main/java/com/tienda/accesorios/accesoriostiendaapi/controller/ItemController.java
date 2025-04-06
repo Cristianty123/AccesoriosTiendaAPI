@@ -1,5 +1,6 @@
 package com.tienda.accesorios.accesoriostiendaapi.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tienda.accesorios.accesoriostiendaapi.dto.AdditionalExpenseResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemRequest;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
@@ -8,11 +9,14 @@ import com.tienda.accesorios.accesoriostiendaapi.model.Item;
 import com.tienda.accesorios.accesoriostiendaapi.model.ItemAdditionalExpense;
 import com.tienda.accesorios.accesoriostiendaapi.repository.AdditionalExpenseRepository;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpenseRepository;
+import com.tienda.accesorios.accesoriostiendaapi.service.ImageService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Base64;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,11 +33,24 @@ public class ItemController {
     @Autowired
     private AdditionalExpenseRepository additionalExpenseRepository;
 
+    @Autowired
+    private ImageService imageService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     // Guardar un nuevo Item desde un JSON
-    @PostMapping("/add")
-    public Item agregarItem(@RequestBody ItemRequest itemRequest) {
-        // Convertir Base64 a byte[]
-        byte[] imageBytes = Base64.getDecoder().decode(itemRequest.getImage());
+    @PostMapping(value = "/add")
+    public ItemResponse agregarItem(
+            @RequestPart("item") String itemJson,
+            @RequestPart("image") MultipartFile imageFile) throws IOException {
+
+        ItemRequest itemRequest = objectMapper.readValue(itemJson, ItemRequest.class);
+
+        String imageurl = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageurl = imageService.saveImage(imageFile);
+        }
 
         // Crear objeto Item
         Item item = new Item(
@@ -41,25 +58,38 @@ public class ItemController {
                 itemRequest.getName(),
                 itemRequest.getDescription(),
                 itemRequest.getStock(),
-                itemRequest.getSellingPrice(),
-                itemRequest.getPurchasePrice(),
-                itemRequest.getItemState(),
-                imageBytes,
-                itemRequest.getItemType()
+                itemRequest.getSellingprice(),
+                itemRequest.getPurchaseprice(),
+                itemRequest.getItemstate(),
+                imageurl,
+                itemRequest.getItemtype()
         );
 
         Item savedItem = itemRepository.save(item);
 
-        for (Integer expenseId : itemRequest.getAdditionalExpenseIds()) {
-            Optional<AdditionalExpense> expenseOpt = additionalExpenseRepository.findById(expenseId);
-            if (expenseOpt.isPresent()) {
-                AdditionalExpense expense = expenseOpt.get();
-                ItemAdditionalExpense relation = new ItemAdditionalExpense(savedItem, expense);
-                itemAdditionalExpenseRepository.save(relation);
+        // Asociar gastos adicionales si los hay
+        if (itemRequest.getAdditionalExpenseIds() != null) {
+            for (Integer expenseId : itemRequest.getAdditionalExpenseIds()) {
+                Optional<AdditionalExpense> expenseOpt = additionalExpenseRepository.findById(expenseId);
+                if (expenseOpt.isPresent()) {
+                    AdditionalExpense expense = expenseOpt.get();
+                    ItemAdditionalExpense relation = new ItemAdditionalExpense(savedItem, expense);
+                    itemAdditionalExpenseRepository.save(relation);
+                }
             }
         }
 
-        return savedItem;
+        return new ItemResponse(
+                savedItem.getId(),
+                savedItem.getName(),
+                savedItem.getDescription(),
+                savedItem.getStock(),
+                savedItem.getSellingprice(),
+                savedItem.getPurchaseprice(),
+                savedItem.getItemstate(),
+                savedItem.getItemtype(),
+                savedItem.getimageUrl()
+        );
     }
 
     // Obtener un item
@@ -68,18 +98,16 @@ public class ItemController {
         Optional<Item> optionalItem = itemRepository.findById(id);
         if (optionalItem.isPresent()) {
             Item item = optionalItem.get();
-            String pictureBase64 = Base64.getEncoder().encodeToString(item.getImage());
-
             return new ItemResponse(
                     item.getId(),
                     item.getName(),
                     item.getDescription(),
                     item.getStock(),
-                    item.getSellingPrice(),
-                    item.getPurchasePrice(),
-                    item.getItemState(),
-                    item.getItemType(),
-                    pictureBase64
+                    item.getSellingprice(),
+                    item.getPurchaseprice(),
+                    item.getItemstate(),
+                    item.getItemtype(),
+                    item.getimageUrl()
             );
         } else {
             throw new RuntimeException("Item no encontrado");
