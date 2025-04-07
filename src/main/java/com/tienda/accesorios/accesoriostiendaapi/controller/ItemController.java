@@ -2,6 +2,7 @@ package com.tienda.accesorios.accesoriostiendaapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tienda.accesorios.accesoriostiendaapi.dto.AdditionalExpenseResponse;
+import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemRequest;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
 import com.tienda.accesorios.accesoriostiendaapi.model.AdditionalExpense;
@@ -10,10 +11,10 @@ import com.tienda.accesorios.accesoriostiendaapi.model.ItemAdditionalExpense;
 import com.tienda.accesorios.accesoriostiendaapi.repository.AdditionalExpenseRepository;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpenseRepository;
 import com.tienda.accesorios.accesoriostiendaapi.service.ImageService;
-import org.springframework.http.MediaType;
+import com.tienda.accesorios.accesoriostiendaapi.service.ItemService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,20 +25,21 @@ import java.util.Optional;
 @RequestMapping("/items")
 public class ItemController {
 
-    @Autowired
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
+    private final ItemAdditionalExpenseRepository itemAdditionalExpenseRepository;
+    private final AdditionalExpenseRepository additionalExpenseRepository;
+    private final ImageService imageService;
+    private final ObjectMapper objectMapper;
+    private final ItemService itemService;
 
-    @Autowired
-    private ItemAdditionalExpenseRepository itemAdditionalExpenseRepository;
-
-    @Autowired
-    private AdditionalExpenseRepository additionalExpenseRepository;
-
-    @Autowired
-    private ImageService imageService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    public ItemController(ItemRepository itemRepository, ItemAdditionalExpenseRepository itemAdditionalExpenseRepository, AdditionalExpenseRepository additionalExpenseRepository, ItemService itemService, ObjectMapper objectMapper, ImageService imageService) {
+        this.itemRepository = itemRepository;
+        this.itemAdditionalExpenseRepository = itemAdditionalExpenseRepository;
+        this.additionalExpenseRepository = additionalExpenseRepository;
+        this.itemService = itemService;
+        this.objectMapper = objectMapper;
+        this.imageService = imageService;
+    }
 
     // Guardar un nuevo Item desde un JSON
     @PostMapping(value = "/add")
@@ -94,24 +96,9 @@ public class ItemController {
 
     // Obtener un item
     @GetMapping("/{id}")
-    public ItemResponse getItem(@PathVariable String id) {
-        Optional<Item> optionalItem = itemRepository.findById(id);
-        if (optionalItem.isPresent()) {
-            Item item = optionalItem.get();
-            return new ItemResponse(
-                    item.getId(),
-                    item.getName(),
-                    item.getDescription(),
-                    item.getStock(),
-                    item.getSellingprice(),
-                    item.getPurchaseprice(),
-                    item.getItemstate(),
-                    item.getItemtype(),
-                    item.getimageUrl()
-            );
-        } else {
-            throw new RuntimeException("Item no encontrado");
-        }
+    public ResponseEntity<ItemResponse> getItem(@PathVariable String id) {
+        ItemResponse item = itemService.getItemById(id);
+        return ResponseEntity.ok(item);
     }
     @GetMapping("/{id}/gastos-adicionales")
     public List<AdditionalExpenseResponse> obtenerGastosPorItem(@PathVariable String id) {
@@ -128,5 +115,13 @@ public class ItemController {
                     );
                 })
                 .toList();
+    }
+    @GetMapping("/page")
+    public ResponseEntity<ItemPageResponse> getItemsByPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String itemTypeId) {
+
+        ItemPageResponse response = itemService.getItemsByPage(page, Optional.ofNullable(itemTypeId));
+        return ResponseEntity.ok(response);
     }
 }
