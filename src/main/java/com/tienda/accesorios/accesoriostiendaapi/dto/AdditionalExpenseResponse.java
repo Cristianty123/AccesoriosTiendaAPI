@@ -1,12 +1,12 @@
 package com.tienda.accesorios.accesoriostiendaapi.dto;
 
-public class AdditionalExpenseDTO {
+public class AdditionalExpenseResponse {
     private Integer id;
     private String name;
     private Double expense;
     private String description;
 
-    public AdditionalExpenseDTO(Integer id,String name, Double expense, String description) {
+    public AdditionalExpenseResponse(Integer id, String name, Double expense, String description) {
         this.name = name;
         this.id = id;
         this.expense = expense;

@@ -1,48 +1,71 @@
 package com.tienda.accesorios.accesoriostiendaapi.service;
 
+import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
+import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
+import com.tienda.accesorios.accesoriostiendaapi.exception.ItemNotFoundException;
 import com.tienda.accesorios.accesoriostiendaapi.model.Item;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemRepository;
+import com.tienda.accesorios.accesoriostiendaapi.exception.NoItemsFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ItemService {
+
     private final ItemRepository itemRepository;
-    private static final String UPLOAD_DIR = "uploads/";
 
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
+    public ItemPageResponse getItemsByPage(int pageNumber, Optional<String> itemTypeId) {
+        int pageSize = 6;
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("createdAt").descending());
 
-    public String guardarImagen(MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            throw new IOException("El archivo está vacío");
+        Page<Item> itemsPage = itemTypeId
+                .map(id -> itemRepository.findAllByItemtypeIdOrderByCreatedAtDesc(id, pageable))
+                .orElseGet(() -> itemRepository.findAllByOrderByCreatedAtDesc(pageable));
+
+
+        if (itemsPage.isEmpty()) {
+            throw new NoItemsFoundException("La página seleccionada no tiene items.");
         }
 
-        // Crear carpeta si no existe
-        Path uploadPath = Paths.get(UPLOAD_DIR);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
+        List<ItemResponse> items = itemsPage.stream()
+                .map(item -> new ItemResponse(
+                        item.getId(),
+                        item.getName(),
+                        item.getDescription(),
+                        item.getStock(),
+                        item.getSellingprice(),
+                        item.getPurchaseprice(),
+                        item.getItemstate(),
+                        item.getItemtype(),
+                        item.getimageUrl()))
+                .toList();
 
-        // Guardar archivo en la carpeta "uploads"
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return new ItemPageResponse(itemsPage.getTotalPages(), pageNumber, items);
+    }
+    public ItemResponse getItemById(String itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException("El item con ID " + itemId + " no fue encontrado."));
 
-        return "/uploads/" + fileName; // Ruta de la imagen
+        return new ItemResponse(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getStock(),
+                item.getSellingprice(),
+                item.getPurchaseprice(),
+                item.getItemstate(),
+                item.getItemtype(),
+                item.getimageUrl()
+        );
     }
 
-    public Item agregarItem(Item item) {
-        return itemRepository.save(item);
-    }
-
-    public List<Item> getAllItems() {
-        return itemRepository.findAll();
-    }
 }
