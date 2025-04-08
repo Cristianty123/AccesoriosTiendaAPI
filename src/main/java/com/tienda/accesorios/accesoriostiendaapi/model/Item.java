@@ -13,7 +13,7 @@ public class Item {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, insertable = false, updatable=false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)

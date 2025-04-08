@@ -1,0 +1,2 @@
+--Obtener pages typeitem
+http://localhost:8080/items/page?page=1&itemTypeId=abc123
