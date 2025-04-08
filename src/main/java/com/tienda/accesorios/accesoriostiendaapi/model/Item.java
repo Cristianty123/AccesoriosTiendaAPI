@@ -1,6 +1,8 @@
 package com.tienda.accesorios.accesoriostiendaapi.model;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "item")
 public class Item {
@@ -10,6 +12,9 @@ public class Item {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private String description;
@@ -40,6 +45,14 @@ public class Item {
         this.itemstate = itemstate;
         this.imageurl = imageurl;
         this.itemtype = itemtype;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     // Getters y Setters
