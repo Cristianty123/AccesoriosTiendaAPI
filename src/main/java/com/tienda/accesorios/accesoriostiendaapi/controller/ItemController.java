@@ -6,15 +6,12 @@ import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemRequest;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
 import com.tienda.accesorios.accesoriostiendaapi.model.AdditionalExpense;
-import com.tienda.accesorios.accesoriostiendaapi.model.Item;
 import com.tienda.accesorios.accesoriostiendaapi.model.ItemAdditionalExpense;
-import com.tienda.accesorios.accesoriostiendaapi.repository.AdditionalExpenseRepository;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpenseRepository;
-import com.tienda.accesorios.accesoriostiendaapi.service.ImageService;
 import com.tienda.accesorios.accesoriostiendaapi.service.ItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.tienda.accesorios.accesoriostiendaapi.repository.ItemRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,75 +22,27 @@ import java.util.Optional;
 @RequestMapping("/items")
 public class ItemController {
 
-    private final ItemRepository itemRepository;
     private final ItemAdditionalExpenseRepository itemAdditionalExpenseRepository;
-    private final AdditionalExpenseRepository additionalExpenseRepository;
-    private final ImageService imageService;
     private final ObjectMapper objectMapper;
     private final ItemService itemService;
 
-    public ItemController(ItemRepository itemRepository, ItemAdditionalExpenseRepository itemAdditionalExpenseRepository, AdditionalExpenseRepository additionalExpenseRepository, ItemService itemService, ObjectMapper objectMapper, ImageService imageService) {
-        this.itemRepository = itemRepository;
+    public ItemController(ItemAdditionalExpenseRepository itemAdditionalExpenseRepository, ItemService itemService, ObjectMapper objectMapper) {
         this.itemAdditionalExpenseRepository = itemAdditionalExpenseRepository;
-        this.additionalExpenseRepository = additionalExpenseRepository;
         this.itemService = itemService;
         this.objectMapper = objectMapper;
-        this.imageService = imageService;
     }
 
     // Guardar un nuevo Item desde un JSON
     @PostMapping(value = "/add")
-    public ItemResponse agregarItem(
+    public ResponseEntity<ItemResponse> agregarItem(
             @RequestPart("item") String itemJson,
             @RequestPart("image") MultipartFile imageFile) throws IOException {
 
         ItemRequest itemRequest = objectMapper.readValue(itemJson, ItemRequest.class);
+        ItemResponse response = itemService.crearItem(itemRequest, imageFile);
 
-        String imageurl = null;
-        if (imageFile != null && !imageFile.isEmpty()) {
-            imageurl = imageService.saveImage(imageFile);
-        }
-
-        // Crear objeto Item
-        Item item = new Item(
-                itemRequest.getId(),
-                itemRequest.getName(),
-                itemRequest.getDescription(),
-                itemRequest.getStock(),
-                itemRequest.getSellingprice(),
-                itemRequest.getPurchaseprice(),
-                itemRequest.getItemstate(),
-                imageurl,
-                itemRequest.getItemtype()
-        );
-
-        Item savedItem = itemRepository.save(item);
-
-        // Asociar gastos adicionales si los hay
-        if (itemRequest.getAdditionalExpenseIds() != null) {
-            for (Integer expenseId : itemRequest.getAdditionalExpenseIds()) {
-                Optional<AdditionalExpense> expenseOpt = additionalExpenseRepository.findById(expenseId);
-                if (expenseOpt.isPresent()) {
-                    AdditionalExpense expense = expenseOpt.get();
-                    ItemAdditionalExpense relation = new ItemAdditionalExpense(savedItem, expense);
-                    itemAdditionalExpenseRepository.save(relation);
-                }
-            }
-        }
-
-        return new ItemResponse(
-                savedItem.getId(),
-                savedItem.getName(),
-                savedItem.getDescription(),
-                savedItem.getStock(),
-                savedItem.getSellingprice(),
-                savedItem.getPurchaseprice(),
-                savedItem.getItemstate(),
-                savedItem.getItemtype(),
-                savedItem.getimageUrl()
-        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
     // Obtener un item
     @GetMapping("/{id}")
     public ResponseEntity<ItemResponse> getItem(@PathVariable String id) {

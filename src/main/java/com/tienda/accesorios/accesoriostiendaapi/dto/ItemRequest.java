@@ -5,7 +5,6 @@ import com.tienda.accesorios.accesoriostiendaapi.model.ItemType;
 import java.util.List;
 
 public class ItemRequest {
-    private String id;
     private String name;
     private String description;
     private int stock;
@@ -16,8 +15,7 @@ public class ItemRequest {
     private List<Integer> additionalExpenseIds;
     private String imageurl;
 
-    public ItemRequest(String id, String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, List<Integer> additionalExpenseIds, String imageurl) {
-        this.id = id;
+    public ItemRequest(String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, List<Integer> additionalExpenseIds, String imageurl) {
         this.name = name;
         this.description = description;
         this.stock = stock;
@@ -30,9 +28,6 @@ public class ItemRequest {
     }
 
     // Getters y Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
