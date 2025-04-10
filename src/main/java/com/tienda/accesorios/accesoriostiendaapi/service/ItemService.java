@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +40,7 @@ public class ItemService {
         this.entityManager = entityManager;
     }
 
-    public ItemResponse crearItem(ItemRequest itemRequest, MultipartFile imageFile) throws IOException {
+    public ItemResponse createItem(ItemRequest itemRequest, MultipartFile imageFile) throws IOException {
         String imageUrl = null;
         if (imageFile != null && !imageFile.isEmpty()) {
             imageUrl = imageService.saveImage(imageFile);
@@ -110,7 +111,9 @@ public class ItemService {
                         item.getimageUrl()))
                 .toList();
 
-        return new ItemPageResponse(itemsPage.getTotalPages(), pageNumber, items);
+        List<String> pagesToShow = calculatePagesToShow(itemsPage.getTotalPages(), pageNumber);
+
+        return new ItemPageResponse(itemsPage.getTotalPages(), pageNumber, pagesToShow, items);
     }
     public ItemResponse getItemById(String itemId) {
         Item item = itemRepository.findById(itemId)
@@ -128,5 +131,39 @@ public class ItemService {
                 item.getimageUrl()
         );
     }
+    private List<String> calculatePagesToShow(int totalPages, int currentPage) {
+        List<String> pages = new ArrayList<>();
+
+        if (totalPages <= 13) {
+            for (int i = 1; i <= totalPages; i++) {
+                pages.add(String.valueOf(i));
+            }
+            return pages;
+        }
+
+        pages.add("1");
+        pages.add("2");
+
+        if (currentPage > 5) {
+            pages.add("...");
+        }
+
+        int start = Math.max(3, currentPage - 3);
+        int end = Math.min(totalPages - 2, currentPage + 3);
+
+        for (int i = start; i <= end; i++) {
+            pages.add(String.valueOf(i));
+        }
+
+        if (currentPage < totalPages - 4) {
+            pages.add("...");
+        }
+
+        pages.add(String.valueOf(totalPages - 1));
+        pages.add(String.valueOf(totalPages));
+
+        return pages;
+    }
+
 
 }

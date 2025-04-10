@@ -39,7 +39,7 @@ public class ItemController {
             @RequestPart("image") MultipartFile imageFile) throws IOException {
 
         ItemRequest itemRequest = objectMapper.readValue(itemJson, ItemRequest.class);
-        ItemResponse response = itemService.crearItem(itemRequest, imageFile);
+        ItemResponse response = itemService.createItem(itemRequest, imageFile);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
