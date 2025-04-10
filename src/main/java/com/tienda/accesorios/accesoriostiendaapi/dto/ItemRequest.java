@@ -12,10 +12,12 @@ public class ItemRequest {
     private Double purchaseprice;
     private Boolean itemstate;
     private ItemType itemtype;
+    private boolean free_shipping;
+    private Double price_shipping;
     private List<Integer> additionalExpenseIds;
     private String imageurl;
 
-    public ItemRequest(String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, List<Integer> additionalExpenseIds, String imageurl) {
+    public ItemRequest(String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, boolean free_shipping, Double price_shipping, List<Integer> additionalExpenseIds, String imageurl) {
         this.name = name;
         this.description = description;
         this.stock = stock;
@@ -23,6 +25,8 @@ public class ItemRequest {
         this.purchaseprice = purchaseprice;
         this.itemstate = itemstate;
         this.itemtype = itemtype;
+        this.free_shipping = free_shipping;
+        this.price_shipping = price_shipping;
         this.additionalExpenseIds = additionalExpenseIds;
         this.imageurl = imageurl;
     }
@@ -54,4 +58,20 @@ public class ItemRequest {
 
     public String getImageurl() { return imageurl; }
     public void setImageurl(String imageurl) { this.imageurl = imageurl; }
+
+    public boolean isFree_shipping() {
+        return free_shipping;
+    }
+
+    public void setFree_shipping(boolean free_shipping) {
+        this.free_shipping = free_shipping;
+    }
+
+    public Double getPrice_shipping() {
+        return price_shipping;
+    }
+
+    public void setPrice_shipping(Double price_shipping) {
+        this.price_shipping = price_shipping;
+    }
 }

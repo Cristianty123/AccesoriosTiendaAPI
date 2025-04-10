@@ -9,46 +9,101 @@ public class ItemResponse {
     private int stock;
     private Double sellingprice;
     private Double purchaseprice;
-    private Boolean itemstate;
     private ItemType itemtype;
+    private boolean free_shipping;
+    private Double price_shipping;
     private String imageurl;
 
-    public ItemResponse(String id, String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, String imageurl) {
+    public ItemResponse(String id, String name, String description, int stock, Double sellingprice, Double purchaseprice, ItemType itemtype, boolean free_shipping, Double price_shipping, String imageurl) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.stock = stock;
         this.sellingprice = sellingprice;
         this.purchaseprice = purchaseprice;
-        this.itemstate = itemstate;
         this.itemtype = itemtype;
+        this.free_shipping = free_shipping;
+        this.price_shipping = price_shipping;
         this.imageurl = imageurl;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public Double getSellingprice() { return sellingprice; }
-    public void setSellingprice(Double sellingprice) { this.sellingprice = sellingprice; }
+    public String getDescription() {
+        return description;
+    }
 
-    public Double getPurchaseprice() { return purchaseprice; }
-    public void setPurchaseprice(Double purchaseprice) { this.purchaseprice = purchaseprice; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public Boolean getItemstate() { return itemstate; }
-    public void setItemstate(Boolean itemstate) { this.itemstate = itemstate; }
+    public int getStock() {
+        return stock;
+    }
 
-    public ItemType getItemtype() { return itemtype; }
-    public void setItemtype(ItemType itemtype) { this.itemtype = itemtype; }
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
 
-    public String getImageurl() { return imageurl; }
-    public void setImageurl(String imageurl) { this.imageurl = imageurl; }
+    public Double getSellingprice() {
+        return sellingprice;
+    }
+
+    public void setSellingprice(Double sellingprice) {
+        this.sellingprice = sellingprice;
+    }
+
+    public ItemType getItemtype() {
+        return itemtype;
+    }
+
+    public void setItemtype(ItemType itemtype) {
+        this.itemtype = itemtype;
+    }
+
+    public Double getPurchaseprice() {
+        return purchaseprice;
+    }
+
+    public void setPurchaseprice(Double purchaseprice) {
+        this.purchaseprice = purchaseprice;
+    }
+
+    public boolean isFree_shipping() {
+        return free_shipping;
+    }
+
+    public void setFree_shipping(boolean free_shipping) {
+        this.free_shipping = free_shipping;
+    }
+
+    public Double getPrice_shipping() {
+        return price_shipping;
+    }
+
+    public void setPrice_shipping(Double price_shipping) {
+        this.price_shipping = price_shipping;
+    }
+
+    public String getImageurl() {
+        return imageurl;
+    }
+
+    public void setImageurl(String imageurl) {
+        this.imageurl = imageurl;
+    }
 }

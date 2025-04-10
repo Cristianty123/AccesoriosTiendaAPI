@@ -41,9 +41,9 @@ public class ItemService {
     }
 
     public ItemResponse createItem(ItemRequest itemRequest, MultipartFile imageFile) throws IOException {
-        String imageUrl = null;
+        String imageurl = null;
         if (imageFile != null && !imageFile.isEmpty()) {
-            imageUrl = imageService.saveImage(imageFile);
+            imageurl = imageService.saveImage(imageFile);
         }
 
         Long siguienteValor = ((Number) entityManager
@@ -54,13 +54,15 @@ public class ItemService {
         Item item = new Item(
                 idBonito,
                 itemRequest.getName(),
-                itemRequest.getDescription(),
                 itemRequest.getStock(),
-                itemRequest.getSellingprice(),
+                itemRequest.getDescription(),
                 itemRequest.getPurchaseprice(),
+                itemRequest.getSellingprice(),
                 itemRequest.getItemstate(),
-                imageUrl,
-                itemRequest.getItemtype()
+                imageurl,
+                itemRequest.getItemtype(),
+                itemRequest.isFree_shipping(),
+                itemRequest.getPrice_shipping()
         );
 
         Item savedItem = itemRepository.save(item);
@@ -80,9 +82,10 @@ public class ItemService {
                 savedItem.getStock(),
                 savedItem.getSellingprice(),
                 savedItem.getPurchaseprice(),
-                savedItem.getItemstate(),
                 savedItem.getItemtype(),
-                savedItem.getimageUrl()
+                savedItem.isFree_shipping(),
+                savedItem.getPrice_shipping(),
+                savedItem.getimageurl()
         );
     }
     public ItemPageResponse getItemsByPage(int pageNumber, Optional<String> itemTypeId) {
@@ -106,9 +109,10 @@ public class ItemService {
                         item.getStock(),
                         item.getSellingprice(),
                         item.getPurchaseprice(),
-                        item.getItemstate(),
                         item.getItemtype(),
-                        item.getimageUrl()))
+                        item.isFree_shipping(),
+                        item.getPrice_shipping(),
+                        item.getimageurl()))
                 .toList();
 
         List<String> pagesToShow = calculatePagesToShow(itemsPage.getTotalPages(), pageNumber);
@@ -126,9 +130,10 @@ public class ItemService {
                 item.getStock(),
                 item.getSellingprice(),
                 item.getPurchaseprice(),
-                item.getItemstate(),
                 item.getItemtype(),
-                item.getimageUrl()
+                item.isFree_shipping(),
+                item.getPrice_shipping(),
+                item.getimageurl()
         );
     }
     private List<String> calculatePagesToShow(int totalPages, int currentPage) {
@@ -164,6 +169,4 @@ public class ItemService {
 
         return pages;
     }
-
-
 }
