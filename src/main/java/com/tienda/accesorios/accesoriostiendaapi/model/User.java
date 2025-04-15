@@ -1,24 +1,47 @@
 package com.tienda.accesorios.accesoriostiendaapi.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
 @Entity
-@Table(name = "\"User\"") // Debido a que el nombre es reservado
+@Table(name = "users")
 public class User {
-
     @Id
+    @Column(length = 50)
     private String id;
 
-    @Column
+    @Column(unique = true, nullable = false, length = 255)
     private String email;
 
-    @Column
+    @Column(nullable = false, length = 255)
     private String password;
 
-    // Suponiendo que tengas un mapeo a usertype y que éste tenga la relación con roles.
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userstate_id", nullable = false)
+    private UserState userState;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usertype_id", nullable = false)
-    private UserType usertype;
+    private UserType userType;
+
+    @Column(length = 255)
+    private String token;
+
+    // Relación con el perfil (one-to-one)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserProfile profile;
+
+    // Método conveniente para agregar roles (si necesitas)
+    public List<Role> getRoles() {
+        if (this.userType != null && this.userType.getRoles() != null) {
+            return new ArrayList<>(this.userType.getRoles());
+        }
+        return new ArrayList<>();
+    }
 
     public String getId() {
         return id;
@@ -44,11 +67,35 @@ public class User {
         this.password = password;
     }
 
-    public UserType getUsertype() {
-        return usertype;
+    public UserState getUserState() {
+        return userState;
     }
 
-    public void setUsertype(UserType usertype) {
-        this.usertype = usertype;
+    public void setUserState(UserState userState) {
+        this.userState = userState;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public UserProfile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(UserProfile profile) {
+        this.profile = profile;
     }
 }
