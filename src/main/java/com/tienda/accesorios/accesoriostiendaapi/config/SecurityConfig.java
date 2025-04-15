@@ -16,7 +16,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> {
                     authorize
-                            .requestMatchers("/public/**").permitAll()
+                            .requestMatchers(
+                                    "/items/public/**",
+                                    "/uploads/**"
+                                    ).permitAll()
                             .anyRequest().authenticated();
                 })
                 .formLogin(form -> {

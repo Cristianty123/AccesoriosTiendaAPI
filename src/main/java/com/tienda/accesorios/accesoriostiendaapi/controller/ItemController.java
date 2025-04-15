@@ -65,7 +65,7 @@ public class ItemController {
                 })
                 .toList();
     }
-    @GetMapping("/page")
+    @GetMapping("/public/page")
     public ResponseEntity<ItemPageResponse> getItemsByPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) String itemTypeId) {
