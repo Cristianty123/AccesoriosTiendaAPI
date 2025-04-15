@@ -41,7 +41,7 @@ public class CustomUserDetailService implements UserDetailsService {
     // Método para extraer roles y convertirlos a GrantedAuthorities
     private Collection<GrantedAuthority> extractAuthorities(User user) {
         // Se asume que los roles vienen del userType del usuario
-        Set<Role> roles = user.getUsertype().getRoles();
+        Set<Role> roles = user.getUserType().getRoles();
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()))
                 .collect(Collectors.toSet());
