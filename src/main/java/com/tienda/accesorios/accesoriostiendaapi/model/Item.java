@@ -33,18 +33,23 @@ public class Item {
     @JoinColumn(name = "itemtype", referencedColumnName = "id")
     private ItemType itemtype;
 
+    private boolean free_shipping;
+    private Double price_shipping;
+
     public Item() {}
 
-    public Item(String id, String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, String imageurl, ItemType itemtype) {
+    public Item(String id, String name, int stock, String description, Double purchaseprice, Double sellingprice, Boolean itemstate, String imageurl, ItemType itemtype, boolean free_shipping, Double price_shipping) {
         this.id = id;
         this.name = name;
-        this.description = description;
         this.stock = stock;
-        this.sellingprice = sellingprice;
+        this.description = description;
         this.purchaseprice = purchaseprice;
+        this.sellingprice = sellingprice;
         this.itemstate = itemstate;
         this.imageurl = imageurl;
         this.itemtype = itemtype;
+        this.free_shipping = free_shipping;
+        this.price_shipping = price_shipping;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -77,9 +82,25 @@ public class Item {
     public Boolean getItemstate() { return itemstate; }
     public void setItemstate(Boolean itemState) { this.itemstate = itemState; }
 
-    public String getimageUrl() { return imageurl; }
-    public void setimageUrl(String imageUrl) { this.imageurl = imageUrl; }
+    public String getimageurl() { return imageurl; }
+    public void setimageurl(String imageUrl) { this.imageurl = imageUrl; }
 
     public ItemType getItemtype() { return itemtype; }
     public void setItemtype(ItemType itemType) { this.itemtype = itemType; }
+
+    public boolean isFree_shipping() {
+        return free_shipping;
+    }
+
+    public void setFree_shipping(boolean free_shipping) {
+        this.free_shipping = free_shipping;
+    }
+
+    public Double getPrice_shipping() {
+        return price_shipping;
+    }
+
+    public void setPrice_shipping(Double price_shipping) {
+        this.price_shipping = price_shipping;
+    }
 }
