@@ -36,6 +36,11 @@ public class Item {
     private boolean free_shipping;
     private Double price_shipping;
 
+    @ManyToOne
+    @JoinColumn(name = "discount", referencedColumnName = "id")
+    private Discount discount;
+
+
     public Item() {}
 
     public Item(String id, String name, int stock, String description, Double purchaseprice, Double sellingprice, Boolean itemstate, String imageurl, ItemType itemtype, boolean free_shipping, Double price_shipping) {
@@ -103,4 +108,22 @@ public class Item {
     public void setPrice_shipping(Double price_shipping) {
         this.price_shipping = price_shipping;
     }
+
+    public Discount getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Discount discount) {
+        this.discount = discount;
+    }
+
+    public String getImageurl() {
+        return imageurl;
+    }
+
+    public void setImageurl(String imageurl) {
+        this.imageurl = imageurl;
+    }
+
+
 }

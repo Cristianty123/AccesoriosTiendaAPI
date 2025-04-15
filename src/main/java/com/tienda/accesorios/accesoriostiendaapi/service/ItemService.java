@@ -4,9 +4,11 @@ import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemRequest;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
 import com.tienda.accesorios.accesoriostiendaapi.exception.ItemNotFoundException;
+import com.tienda.accesorios.accesoriostiendaapi.model.Discount;
 import com.tienda.accesorios.accesoriostiendaapi.model.Item;
 import com.tienda.accesorios.accesoriostiendaapi.model.ItemAdditionalExpense;
 import com.tienda.accesorios.accesoriostiendaapi.repository.AdditionalExpenseRepository;
+import com.tienda.accesorios.accesoriostiendaapi.repository.DiscountRepository;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpenseRepository;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemRepository;
 import com.tienda.accesorios.accesoriostiendaapi.exception.NoItemsFoundException;
@@ -31,13 +33,23 @@ public class ItemService {
     private final ItemAdditionalExpenseRepository itemAdditionalExpenseRepository;
     private final ImageService imageService;
     private final EntityManager entityManager;
+    private final DiscountRepository discountRepository;
 
-    public ItemService(ItemRepository itemRepository, AdditionalExpenseRepository additionalExpenseRepository, ItemAdditionalExpenseRepository itemAdditionalExpenseRepository, ImageService imageService, EntityManager entityManager) {
+
+    public ItemService(
+            ItemRepository itemRepository,
+            AdditionalExpenseRepository additionalExpenseRepository,
+            ItemAdditionalExpenseRepository itemAdditionalExpenseRepository,
+            ImageService imageService,
+            EntityManager entityManager,
+            DiscountRepository discountRepository // <- este
+    ) {
         this.itemRepository = itemRepository;
         this.additionalExpenseRepository = additionalExpenseRepository;
         this.itemAdditionalExpenseRepository = itemAdditionalExpenseRepository;
         this.imageService = imageService;
         this.entityManager = entityManager;
+        this.discountRepository = discountRepository; // <- y este
     }
 
     public ItemResponse createItem(ItemRequest itemRequest, MultipartFile imageFile) throws IOException {
@@ -64,6 +76,25 @@ public class ItemService {
                 itemRequest.isFree_shipping(),
                 itemRequest.getPrice_shipping()
         );
+
+        // Lógica para descuento
+        if(itemRequest.getDiscountId() != null) {
+            // Se busca el descuento en el repositorio
+            Optional<Discount> discountOptional = discountRepository.findById(itemRequest.getDiscountId());
+            if(discountOptional.isPresent()) {
+                // Asumimos que el campo discount en Item es opcional y representa el id del descuento
+                // o podrías tener una relación de entidad si el modelo lo permite.
+                item.setDiscount(discountOptional.get());
+                // También podrías considerar asignar la entidad Discount,
+                // dependiendo de cómo esté mapeada la relación (por ejemplo, @ManyToOne)
+            } else {
+                // Manejar el caso en el que el id de descuento enviado no existe.
+                throw new IllegalArgumentException("El descuento con id " + itemRequest.getDiscountId() + " no existe.");
+            }
+        } else {
+            // Si no se envió descuento, se puede dejar como null o asignar un valor por defecto.
+            item.setDiscount(null);
+        }
 
         Item savedItem = itemRepository.save(item);
 

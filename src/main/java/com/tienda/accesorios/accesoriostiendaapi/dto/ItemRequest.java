@@ -16,8 +16,9 @@ public class ItemRequest {
     private Double price_shipping;
     private List<Integer> additionalExpenseIds;
     private String imageurl;
+    private Integer discountId;
 
-    public ItemRequest(String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, boolean free_shipping, Double price_shipping, List<Integer> additionalExpenseIds, String imageurl) {
+    public ItemRequest(String name, String description, int stock, Double sellingprice, Double purchaseprice, Boolean itemstate, ItemType itemtype, boolean free_shipping, Double price_shipping, List<Integer> additionalExpenseIds, String imageurl, Integer discountId) {
         this.name = name;
         this.description = description;
         this.stock = stock;
@@ -29,6 +30,7 @@ public class ItemRequest {
         this.price_shipping = price_shipping;
         this.additionalExpenseIds = additionalExpenseIds;
         this.imageurl = imageurl;
+        this.discountId = discountId;
     }
 
     // Getters y Setters
@@ -73,5 +75,13 @@ public class ItemRequest {
 
     public void setPrice_shipping(Double price_shipping) {
         this.price_shipping = price_shipping;
+    }
+
+    public Integer getDiscountId() {
+        return discountId;
+    }
+
+    public void setDiscountId(Integer discountId) {
+        this.discountId = discountId;
     }
 }
