@@ -150,6 +150,7 @@ public class ItemService {
 
         return new ItemPageResponse(itemsPage.getTotalPages(), pageNumber, pagesToShow, items);
     }
+
     public ItemResponse getItemById(String itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("El item con ID " + itemId + " no fue encontrado."));

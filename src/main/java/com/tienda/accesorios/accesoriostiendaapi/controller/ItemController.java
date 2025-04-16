@@ -44,7 +44,7 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // Obtener un item
-    @GetMapping("/{id}")
+    @GetMapping("/public/{id}")
     public ResponseEntity<ItemResponse> getItem(@PathVariable String id) {
         ItemResponse item = itemService.getItemById(id);
         return ResponseEntity.ok(item);
