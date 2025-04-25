@@ -1,6 +1,5 @@
 package com.tienda.accesorios.accesoriostiendaapi.service;
 
-import com.tienda.accesorios.accesoriostiendaapi.model.Role;
 import com.tienda.accesorios.accesoriostiendaapi.model.User;
 import com.tienda.accesorios.accesoriostiendaapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,40 +9,37 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {
 
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Busca el usuario por email o nombre de usuario
-        Optional<User> userOptional = userRepository.findByEmail(username);
-
-        User user = userOptional.orElseThrow(() ->
-                new UsernameNotFoundException("Usuario no encontrado con email: " + username));
-
-        // Convierte la colección de roles a GrantedAuthority
-        Collection<GrantedAuthority> authorities = extractAuthorities(user);
-
-        // Retorna el objeto UserDetails (usando la clase propia de Spring Security)
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(), user.getPassword(), authorities);
+    public CustomUserDetailService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    // Método para extraer roles y convertirlos a GrantedAuthorities
-    private Collection<GrantedAuthority> extractAuthorities(User user) {
-        // Se asume que los roles vienen del userType del usuario
-        Set<Role> roles = user.getUserType().getRoles();
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()))
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByEmailWithRoles(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + username));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                getAuthorities(user)
+        );
+    }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(User user) {
+        return user.getUserType().getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getId()))
                 .collect(Collectors.toSet());
     }
 }

@@ -52,7 +52,7 @@ public class ItemService {
         this.discountRepository = discountRepository; // <- y este
     }
 
-    public ItemResponse createItem(ItemRequest itemRequest, MultipartFile imageFile) throws IOException {
+    public ItemResponse createItem(ItemRequest itemRequest, MultipartFile imageFile,String username) throws IOException {
         String imageurl = null;
         if (imageFile != null && !imageFile.isEmpty()) {
             imageurl = imageService.saveImage(imageFile);
@@ -62,6 +62,8 @@ public class ItemService {
                 .createNativeQuery("SELECT nextval('item_seq')")
                 .getSingleResult()).longValue();
         String idBonito = "ITEM-" + siguienteValor;
+
+        System.out.println("Creando item por usuario: " + username);
 
         Item item = new Item(
                 idBonito,

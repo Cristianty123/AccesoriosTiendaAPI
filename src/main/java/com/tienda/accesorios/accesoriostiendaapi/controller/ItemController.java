@@ -10,6 +10,8 @@ import com.tienda.accesorios.accesoriostiendaapi.model.ItemAdditionalExpense;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpenseRepository;
 import com.tienda.accesorios.accesoriostiendaapi.service.ItemService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,22 +36,25 @@ public class ItemController {
 
     // Guardar un nuevo Item desde un JSON
     @PostMapping(value = "/add")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<ItemResponse> agregarItem(
             @RequestPart("item") String itemJson,
-            @RequestPart("image") MultipartFile imageFile) throws IOException {
+            @RequestPart("image") MultipartFile imageFile,
+            Authentication authentication) throws IOException {
 
+        String username = authentication.getName();
         ItemRequest itemRequest = objectMapper.readValue(itemJson, ItemRequest.class);
-        ItemResponse response = itemService.createItem(itemRequest, imageFile);
+        ItemResponse response = itemService.createItem(itemRequest, imageFile, username);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // Obtener un item
-    @GetMapping("/{id}")
+    @GetMapping("/public/{id}")
     public ResponseEntity<ItemResponse> getItem(@PathVariable String id) {
         ItemResponse item = itemService.getItemById(id);
         return ResponseEntity.ok(item);
     }
-    @GetMapping("/{id}/gastos-adicionales")
+    @GetMapping("/public/{id}/gastos-adicionales")
     public List<AdditionalExpenseResponse> obtenerGastosPorItem(@PathVariable String id) {
         List<ItemAdditionalExpense> relaciones = itemAdditionalExpenseRepository.findByItemId(id);
 

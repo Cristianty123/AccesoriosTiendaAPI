@@ -4,6 +4,7 @@ import com.tienda.accesorios.accesoriostiendaapi.dto.LoginRequestDTO;
 import com.tienda.accesorios.accesoriostiendaapi.dto.LoginResponseDTO;
 import com.tienda.accesorios.accesoriostiendaapi.service.AuthService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,5 +20,10 @@ public class AuthController {
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest) {
         LoginResponseDTO response = authService.authenticateUser(loginRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken(Authentication authentication) {
+        return ResponseEntity.ok().build();
     }
 }
