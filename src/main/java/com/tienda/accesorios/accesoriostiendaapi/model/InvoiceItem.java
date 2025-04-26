@@ -51,39 +51,20 @@ public class InvoiceItem {
         return invoice;
     }
 
-    public void setInvoice(Invoice invoice) {
-        this.invoice = invoice;
-    }
-
     public Item getItem() {
         return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
     }
 
     public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
     public Double getUnitPrice() {
         return unitPrice;
-    }
-
-    public void setUnitPrice(Double unitPrice) {
-        this.unitPrice = unitPrice;
     }
 
     public Double getSubtotal() {
         return subtotal;
     }
 
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = subtotal;
-    }
 }
