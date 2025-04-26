@@ -3,12 +3,12 @@ package com.tienda.accesorios.accesoriostiendaapi.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "invoice_items")
+@Table(name = "invoice_item")
 public class InvoiceItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
 
     // Relación con la factura
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,7 +43,7 @@ public class InvoiceItem {
 
     // --- Getters y Setters ---
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 

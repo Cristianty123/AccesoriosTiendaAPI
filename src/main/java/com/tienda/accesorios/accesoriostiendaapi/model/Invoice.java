@@ -10,7 +10,7 @@ public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
 
     @Column(columnDefinition = "text")
     private String enterprisedata;

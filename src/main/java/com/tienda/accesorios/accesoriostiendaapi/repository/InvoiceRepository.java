@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
-    List<InvoiceItem> findByInvoiceId(Long invoiceId);
+    List<InvoiceItem> findById(Integer id);
 }

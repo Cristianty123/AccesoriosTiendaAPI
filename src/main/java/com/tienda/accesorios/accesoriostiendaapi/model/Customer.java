@@ -9,49 +9,114 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
 
+    @Column(name = "customername", nullable = false)
     private String customername;
-    private String phone;
+
+    @Column(name = "customerid", nullable = false, unique = true)
+    private String customerid;
+
+    @Column(name = "isbusiness", nullable = false)
+    private boolean isbusiness;
+
+    @Column(name = "address")
     private String address;
-    private String email;
+
+    @Column(name = "customerstate", nullable = false)
+    private boolean customerstate;
+
+    @Column(name = "firstname")
+    private String firstname;
+
+    @Column(name = "lastname")
+    private String lastname;
+
+    @Column(name = "identifiertype", nullable = false)
+    private String identifiertype;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Invoice> invoices;
-
-    // Constructors
-    public Customer() {}
-
-    public Customer(String customername, String phone, String address, String email) {
-        this.customername = customername;
-        this.phone = phone;
-        this.address = address;
-        this.email = email;
-    }
+    private List<CustomerPhoneNumber> phoneNumbers;
 
     // Getters y setters
-    public String getId() {
+
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer    id) {
+        this.id = id;
     }
 
     public String getCustomername() {
         return customername;
     }
 
-    public String getPhone() {
-        return phone;
+    public void setCustomername(String customername) {
+        this.customername = customername;
+    }
+
+    public String getCustomerid() {
+        return customerid;
+    }
+
+    public void setCustomerid(String customerid) {
+        this.customerid = customerid;
+    }
+
+    public boolean isIsbusiness() {
+        return isbusiness;
+    }
+
+    public void setIsbusiness(boolean isbusiness) {
+        this.isbusiness = isbusiness;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public String getEmail() {
-        return email;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public List<Invoice> getInvoices() {
-        return invoices;
+    public boolean isCustomerstate() {
+        return customerstate;
     }
 
+    public void setCustomerstate(boolean customerstate) {
+        this.customerstate = customerstate;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getIdentifiertype() {
+        return identifiertype;
+    }
+
+    public void setIdentifiertype(String identifiertype) {
+        this.identifiertype = identifiertype;
+    }
+
+    public List<CustomerPhoneNumber> getPhoneNumbers() {
+        return phoneNumbers;
+    }
+
+    public void setPhoneNumbers(List<CustomerPhoneNumber> phoneNumbers) {
+        this.phoneNumbers = phoneNumbers;
+    }
 }
