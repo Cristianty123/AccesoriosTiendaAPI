@@ -9,7 +9,7 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String customername;
     private String phone;
@@ -30,7 +30,7 @@ public class Customer {
     }
 
     // Getters y setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

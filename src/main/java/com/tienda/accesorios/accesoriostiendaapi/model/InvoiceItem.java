@@ -8,7 +8,7 @@ public class InvoiceItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     // Relación con la factura
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,7 +43,7 @@ public class InvoiceItem {
 
     // --- Getters y Setters ---
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
