@@ -1,10 +1,7 @@
 package com.tienda.accesorios.accesoriostiendaapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tienda.accesorios.accesoriostiendaapi.dto.AdditionalExpenseResponse;
-import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
-import com.tienda.accesorios.accesoriostiendaapi.dto.ItemRequest;
-import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
+import com.tienda.accesorios.accesoriostiendaapi.dto.*;
 import com.tienda.accesorios.accesoriostiendaapi.model.AdditionalExpense;
 import com.tienda.accesorios.accesoriostiendaapi.model.ItemAdditionalExpense;
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpenseRepository;
@@ -47,6 +44,43 @@ public class ItemController {
         ItemResponse response = itemService.createItem(itemRequest, imageFile, username);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    // Modificar stock
+    @PutMapping("/{id}/stock")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN')")
+    public ResponseEntity<ItemResponse> updateItemStock(
+            @PathVariable String id,
+            @RequestBody StockUpdateRequest stockUpdateRequest,
+            Authentication authentication) {
+
+        String username = authentication.getName();
+        ItemResponse response = itemService.updateItemStock(id, stockUpdateRequest, username);
+        return ResponseEntity.ok(response);
+    }
+    //eliminar un item
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN')")
+    public ResponseEntity<Void> deleteItem(
+            @PathVariable String id,
+            Authentication authentication) {
+
+        String username = authentication.getName();
+        itemService.deleteItem(id, username);
+        return ResponseEntity.noContent().build();
+    }
+    // Actualizar un item
+    @PutMapping(value = "/update/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN')")
+    public ResponseEntity<ItemResponse> updateItem(
+            @PathVariable String id,
+            @RequestPart("item") String itemJson,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile,
+            Authentication authentication) throws IOException {
+
+        String username = authentication.getName();
+        ItemRequest itemRequest = objectMapper.readValue(itemJson, ItemRequest.class);
+        ItemResponse response = itemService.updateItem(id, itemRequest, imageFile, username);
+        return ResponseEntity.ok(response);
     }
     // Obtener un item
     @GetMapping("/public/{id}")

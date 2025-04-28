@@ -6,17 +6,16 @@ import jakarta.persistence.*;
 @Table(name = "invoice_item")
 public class InvoiceItem {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @EmbeddedId
+    private InvoiceItemId id;
 
-    // Relación con la factura
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("invoiceId") // conecta el campo invoiceId de InvoiceItemId
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
-    // Relación con el item (producto vendido)
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("itemId") // conecta el campo itemId de InvoiceItemId
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
@@ -24,7 +23,7 @@ public class InvoiceItem {
     private Integer quantity;
 
     @Column(nullable = false)
-    private Double unitPrice;
+    private Double unit_price;
 
     @Column(nullable = false)
     private Double subtotal;
@@ -37,34 +36,56 @@ public class InvoiceItem {
         this.invoice = invoice;
         this.item = item;
         this.quantity = quantity;
-        this.unitPrice = unitPrice;
+        this.unit_price = unitPrice;
         this.subtotal = subtotal;
+        this.id = new InvoiceItemId(invoice.getId(), item.getId());
     }
 
-    // --- Getters y Setters ---
-
-    public Integer getId() {
+    public InvoiceItemId getId() {
         return id;
+    }
+
+    public void setId(InvoiceItemId id) {
+        this.id = id;
     }
 
     public Invoice getInvoice() {
         return invoice;
     }
 
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
+    }
+
     public Item getItem() {
         return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 
     public Integer getQuantity() {
         return quantity;
     }
 
-    public Double getUnitPrice() {
-        return unitPrice;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Double getUnit_price() {
+        return unit_price;
+    }
+
+    public void setUnit_price(Double unit_price) {
+        this.unit_price = unit_price;
     }
 
     public Double getSubtotal() {
         return subtotal;
     }
 
+    public void setSubtotal(Double subtotal) {
+        this.subtotal = subtotal;
+    }
 }

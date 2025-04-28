@@ -49,4 +49,18 @@ public class ImageService {
         Path filePath = Paths.get(IMAGE_DIRECTORY, fileName);
         return Files.readAllBytes(filePath);
     }
+
+    public void deleteImage(String fileName) throws IOException {
+        if (fileName == null || fileName.isEmpty()) {
+            return;
+        }
+
+        Path filePath = Paths.get(IMAGE_DIRECTORY, fileName);
+        if (Files.exists(filePath)) {
+            Files.delete(filePath);
+            System.out.println("Imagen eliminada: " + filePath);
+        } else {
+            System.out.println("La imagen no existe en: " + filePath);
+        }
+    }
 }

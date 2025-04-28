@@ -3,6 +3,7 @@ package com.tienda.accesorios.accesoriostiendaapi.service;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemRequest;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemResponse;
+import com.tienda.accesorios.accesoriostiendaapi.dto.StockUpdateRequest;
 import com.tienda.accesorios.accesoriostiendaapi.exception.ItemNotFoundException;
 import com.tienda.accesorios.accesoriostiendaapi.model.Discount;
 import com.tienda.accesorios.accesoriostiendaapi.model.Item;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -107,19 +109,7 @@ public class ItemService {
                 });
             }
         }
-
-        return new ItemResponse(
-                savedItem.getId(),
-                savedItem.getName(),
-                savedItem.getDescription(),
-                savedItem.getStock(),
-                savedItem.getSellingprice(),
-                savedItem.getPurchaseprice(),
-                savedItem.getItemtype(),
-                savedItem.isFree_shipping(),
-                savedItem.getPrice_shipping(),
-                savedItem.getimageurl()
-        );
+        return convertToItemResponse(savedItem);
     }
     public ItemPageResponse getItemsByPage(int pageNumber, Optional<String> itemTypeId) {
         int pageSize = 6;
@@ -156,18 +146,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException("El item con ID " + itemId + " no fue encontrado."));
 
-        return new ItemResponse(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getStock(),
-                item.getSellingprice(),
-                item.getPurchaseprice(),
-                item.getItemtype(),
-                item.isFree_shipping(),
-                item.getPrice_shipping(),
-                item.getimageurl()
-        );
+        return convertToItemResponse(item);
     }
     private List<String> calculatePagesToShow(int totalPages, int currentPage) {
         List<String> pages = new ArrayList<>();
@@ -201,5 +180,128 @@ public class ItemService {
         pages.add(String.valueOf(totalPages));
 
         return pages;
+    }
+    public ItemResponse updateItemStock(String itemId, StockUpdateRequest request, String username) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException("Item no encontrado con ID: " + itemId));
+
+        switch (request.getAction()) {
+            case "add":
+                item.setStock(item.getStock() + request.getAmount());
+                break;
+            case "remove":
+                item.setStock(Math.max(0, item.getStock() - request.getAmount()));
+                break;
+            case "set":
+                item.setStock(request.getAmount());
+                break;
+            default:
+                throw new IllegalArgumentException("Acción de stock no válida: " + request.getAction());
+        }
+
+        // Aquí podrías registrar el cambio de stock en un historial con el username y motivo
+        System.out.println("Stock actualizado por " + username + ". Motivo: " + request.getReason());
+
+        Item updatedItem = itemRepository.save(item);
+        return convertToItemResponse(updatedItem);
+    }
+
+    @Transactional
+    public ItemResponse updateItem(String itemId, ItemRequest itemRequest, MultipartFile imageFile, String username) throws IOException {
+        Item existingItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException("Item no encontrado con ID: " + itemId));
+
+
+        // Guardar la URL de la imagen anterior antes de actualizar
+        String oldImageUrl = existingItem.getImageurl();
+
+        // Actualizar campos básicos
+        existingItem.setName(itemRequest.getName());
+        existingItem.setDescription(itemRequest.getDescription());
+        existingItem.setStock(itemRequest.getStock());
+        existingItem.setSellingprice(itemRequest.getSellingprice());
+        existingItem.setPurchaseprice(itemRequest.getPurchaseprice());
+        existingItem.setItemstate(itemRequest.getItemstate());
+        existingItem.setItemtype(itemRequest.getItemtype());
+        existingItem.setFree_shipping(itemRequest.isFree_shipping());
+        existingItem.setPrice_shipping(itemRequest.getPrice_shipping());
+
+        // Actualizar imagen si se proporciona
+        if (imageFile != null && !imageFile.isEmpty()) {
+            // Eliminar la imagen anterior si existe
+            if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                try {
+                    imageService.deleteImage(oldImageUrl);
+                } catch (IOException e) {
+                    System.err.println("Error al eliminar la imagen anterior: " + e.getMessage());
+                    // No lanzamos la excepción para no interrumpir el proceso de actualización
+                }
+            }
+            // Guardar la nueva imagen
+            String imageUrl = imageService.saveImage(imageFile);
+            existingItem.setImageurl(imageUrl);
+        }
+
+        // Actualizar descuento
+        if (itemRequest.getDiscountId() != null) {
+            Discount discount = discountRepository.findById(itemRequest.getDiscountId())
+                    .orElseThrow(() -> new IllegalArgumentException("Descuento no encontrado"));
+            existingItem.setDiscount(discount);
+        } else {
+            existingItem.setDiscount(null);
+        }
+
+        // Actualizar gastos adicionales
+        itemAdditionalExpenseRepository.deleteByItemId(itemId);
+        if (itemRequest.getAdditionalExpenseIds() != null) {
+            for (Integer expenseId : itemRequest.getAdditionalExpenseIds()) {
+                additionalExpenseRepository.findById(expenseId).ifPresent(expense -> {
+                    itemAdditionalExpenseRepository.save(new ItemAdditionalExpense(existingItem, expense));
+                });
+            }
+        }
+
+        Item updatedItem = itemRepository.save(existingItem);
+        System.out.println("Item actualizado por usuario: " + username);
+        return convertToItemResponse(updatedItem);
+    }
+    @Transactional
+    public void deleteItem(String itemId, String username) {
+        // Primero obtenemos el item para ver si tiene imagen asociada
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ItemNotFoundException("Item no encontrado con ID: " + itemId));
+
+        // Eliminar la imagen del servidor si existe
+        if (item.getImageurl() != null && !item.getImageurl().isEmpty()) {
+            try {
+                imageService.deleteImage(item.getImageurl());
+                System.out.println("Imagen del item eliminada: " + item.getImageurl());
+            } catch (IOException e) {
+                System.err.println("Error al eliminar la imagen del item: " + e.getMessage());
+                // Continuamos con la eliminación aunque falle el borrado de la imagen
+            }
+        }
+
+        // Eliminar relaciones con gastos adicionales
+        itemAdditionalExpenseRepository.deleteByItemId(itemId);
+
+        // Finalmente eliminar el item
+        itemRepository.deleteById(itemId);
+        System.out.println("Item eliminado por usuario: " + username);
+    }
+
+    private ItemResponse convertToItemResponse(Item item) {
+        return new ItemResponse(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getStock(),
+                item.getSellingprice(),
+                item.getPurchaseprice(),
+                item.getItemtype(),
+                item.isFree_shipping(),
+                item.getPrice_shipping(),
+                item.getImageurl()
+        );
     }
 }
