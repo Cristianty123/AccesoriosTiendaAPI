@@ -1,5 +1,6 @@
 package com.tienda.accesorios.accesoriostiendaapi.model;
 
+import com.tienda.accesorios.accesoriostiendaapi.dto.InvoiceResponse;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -71,4 +72,18 @@ public class Invoice {
     public void setTotal(Double total) {
         this.total = total;
     }
+
+    public InvoiceResponse mapToResponse(Invoice factura) {
+        return InvoiceResponse.builder()
+                .id(factura.getId())
+                .numero(factura.getNumero())
+                .fecha(factura.getFecha())
+                .clienteNombre(factura.getCliente().getNombre()) // o getNombreCompleto()
+                .total(factura.getTotal())
+                .metodoPago(factura.getMetodoPago().toString()) // Enum o String
+                .estado(factura.getEstado().toString()) // Enum o String
+                .vencimiento(factura.getFechaVencimiento())
+                .build();
+    }
+
 }
