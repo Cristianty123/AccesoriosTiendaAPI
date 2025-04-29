@@ -12,35 +12,51 @@ public class PurchaseOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private LocalDateTime datetime;
+
+    private Double subtotal;
+    private Double total;
+
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @Column(nullable = false)
-    private LocalDateTime datetime;
-
-    @Column(nullable = false)
-    private Double subtotal;
-
-    @Column(nullable = false)
-    private Double total;
-
     @ManyToOne
     @JoinColumn(name = "orderstate_id", nullable = false)
-    private OrderState orderState;
+    private OrderState estado;
 
-    // Constructor vacío
-    public PurchaseOrder() {}
+    @ManyToMany
+    @JoinTable(
+            name = "purchaseorder_item",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private List<Item> items;
 
-    public PurchaseOrder(Customer customer, LocalDateTime datetime, Double subtotal, Double total, OrderState orderState) {
-        this.customer = customer;
-        this.datetime = datetime;
-        this.subtotal = subtotal;
-        this.total = total;
-        this.orderState = orderState;
+    @ManyToMany
+    @JoinTable(
+            name = "purchaseorder_discount",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "discount_id")
+    )
+    private List<Discount> discounts;
+
+    @ManyToMany
+    @JoinTable(
+            name = "purchaseorder_tax",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "tax_id")
+    )
+    private List<Tax> taxes;
+
+    @OneToOne(mappedBy = "order")
+    private Invoice invoice;
+
+    public Double calcularTotal() {
+        return items.stream()
+                .mapToDouble(Item::getSellingprice)
+                .sum(); // puedes agregar descuentos/impuestos si lo deseas
     }
-
-    // Getters y setters
 
     public Integer getId() {
         return id;
@@ -48,14 +64,6 @@ public class PurchaseOrder {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
 
     public LocalDateTime getDatetime() {
@@ -82,11 +90,52 @@ public class PurchaseOrder {
         this.total = total;
     }
 
-    public OrderState getOrderState() {
-        return orderState;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setOrderState(OrderState orderState) {
-        this.orderState = orderState;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public OrderState getEstado() {
+        return estado;
+    }
+
+    public void setEstado(OrderState estado) {
+        this.estado = estado;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+    public List<Discount> getDiscounts() {
+        return discounts;
+    }
+
+    public void setDiscounts(List<Discount> discounts) {
+        this.discounts = discounts;
+    }
+
+    public List<Tax> getTaxes() {
+        return taxes;
+    }
+
+    public void setTaxes(List<Tax> taxes) {
+        this.taxes = taxes;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 }
+

@@ -25,6 +25,10 @@ public class Invoice {
     private Double subtotal;
     private Double total;
 
+    @OneToOne
+    @JoinColumn(name = "purchase_order_id")
+    private PurchaseOrder order;
+
     public Integer getId() {
         return id;
     }
@@ -73,17 +77,11 @@ public class Invoice {
         this.total = total;
     }
 
-    public InvoiceResponse mapToResponse(Invoice factura) {
-        return InvoiceResponse.builder()
-                .id(factura.getId())
-                .numero(factura.getNumero())
-                .fecha(factura.getFecha())
-                .clienteNombre(factura.getCliente().getNombre()) // o getNombreCompleto()
-                .total(factura.getTotal())
-                .metodoPago(factura.getMetodoPago().toString()) // Enum o String
-                .estado(factura.getEstado().toString()) // Enum o String
-                .vencimiento(factura.getFechaVencimiento())
-                .build();
+    public PurchaseOrder getOrder() {
+        return order;
     }
 
+    public void setOrder(PurchaseOrder order) {
+        this.order = order;
+    }
 }
