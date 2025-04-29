@@ -1,6 +1,6 @@
 package com.tienda.accesorios.accesoriostiendaapi.service;
 
-import com.tienda.accesorios.accesoriostiendaapi.model.User;
+import com.tienda.accesorios.accesoriostiendaapi.model.Users;
 import com.tienda.accesorios.accesoriostiendaapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,18 +27,18 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmailWithRoles(username)
+        Users users = userRepository.findByEmailWithRoles(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + username));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                getAuthorities(user)
+                users.getEmail(),
+                users.getPassword(),
+                getAuthorities(users)
         );
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(User user) {
-        return user.getUserType().getRoles().stream()
+    private Collection<? extends GrantedAuthority> getAuthorities(Users users) {
+        return users.getUserType().getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getId()))
                 .collect(Collectors.toSet());
     }

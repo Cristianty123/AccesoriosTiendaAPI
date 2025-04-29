@@ -19,8 +19,7 @@ public class InvoiceItemId implements Serializable {
         this.itemId = itemId;
     }
 
-    // --- Getters y Setters ---
-
+    // --- Getters y Setters ---S
     public Integer getInvoiceId() {
         return invoiceId;
     }

@@ -17,7 +17,7 @@ public class UserProfile {
     @OneToOne
     @MapsId
     @JoinColumn(name = "user_id")
-    private User user;
+    private Users users;
 
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
@@ -46,12 +46,12 @@ public class UserProfile {
         this.userId = userId;
     }
 
-    public User getUser() {
-        return user;
+    public Users getUsers() {
+        return users;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUsers(Users users) {
+        this.users = users;
     }
 
     public String getAvatarUrl() {

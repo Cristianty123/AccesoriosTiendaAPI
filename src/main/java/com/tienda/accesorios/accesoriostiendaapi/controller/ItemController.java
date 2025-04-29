@@ -31,7 +31,11 @@ public class ItemController {
         this.objectMapper = objectMapper;
     }
 
-    // Guardar un nuevo Item desde un JSON
+    /**
+     *
+     * Endpotin que se encarga de agreagr Productos
+     *
+     */
     @PostMapping(value = "/add")
     @PreAuthorize("hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<ItemResponse> agregarItem(
@@ -45,7 +49,12 @@ public class ItemController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    // Modificar stock
+
+    /**
+     *
+     * Endpotin que se encarga de modificar el stock
+     *
+     */
     @PutMapping("/{id}/stock")
     @PreAuthorize("hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<ItemResponse> updateItemStock(
@@ -57,7 +66,12 @@ public class ItemController {
         ItemResponse response = itemService.updateItemStock(id, stockUpdateRequest, username);
         return ResponseEntity.ok(response);
     }
-    //eliminar un item
+
+    /**
+     *
+     * Endpotin que se encarga de eliminar un item
+     *
+     */
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<Void> deleteItem(
@@ -68,7 +82,12 @@ public class ItemController {
         itemService.deleteItem(id, username);
         return ResponseEntity.noContent().build();
     }
-    // Actualizar un item
+
+    /**
+     *
+     * Endpotin que se encarga de actualizar un Productos
+     *
+     */
     @PutMapping(value = "/update/{id}")
     @PreAuthorize("hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<ItemResponse> updateItem(
@@ -82,12 +101,23 @@ public class ItemController {
         ItemResponse response = itemService.updateItem(id, itemRequest, imageFile, username);
         return ResponseEntity.ok(response);
     }
-    // Obtener un item
+
+    /**
+     *
+     * Endpotin que se encarga de obtener un Productos por Id
+     *
+     */
     @GetMapping("/public/{id}")
     public ResponseEntity<ItemResponse> getItem(@PathVariable String id) {
         ItemResponse item = itemService.getItemById(id);
         return ResponseEntity.ok(item);
     }
+
+    /**
+     *
+     * Endpotin que se encarga de obtener gastos adicionales de cada producto
+     *
+     */
     @GetMapping("/public/{id}/gastos-adicionales")
     public List<AdditionalExpenseResponse> obtenerGastosPorItem(@PathVariable String id) {
         List<ItemAdditionalExpense> relaciones = itemAdditionalExpenseRepository.findByItemId(id);
@@ -104,6 +134,12 @@ public class ItemController {
                 })
                 .toList();
     }
+
+    /**
+     *
+     * Endpotin que se encarga de obtener Productos por pagina
+     *
+     */
     @GetMapping("/public/page")
     public ResponseEntity<ItemPageResponse> getItemsByPage(
             @RequestParam(defaultValue = "1") int page,

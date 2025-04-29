@@ -3,7 +3,7 @@ package com.tienda.accesorios.accesoriostiendaapi.service;
 import com.tienda.accesorios.accesoriostiendaapi.dto.LoginRequestDTO;
 import com.tienda.accesorios.accesoriostiendaapi.dto.LoginResponseDTO;
 import com.tienda.accesorios.accesoriostiendaapi.exception.AuthenticationException;
-import com.tienda.accesorios.accesoriostiendaapi.model.User;
+import com.tienda.accesorios.accesoriostiendaapi.model.Users;
 import com.tienda.accesorios.accesoriostiendaapi.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,17 +40,17 @@ public class AuthService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            User user = userRepository.findByEmailWithRoles(loginRequest.getEmail())
+            Users users = userRepository.findByEmailWithRoles(loginRequest.getEmail())
                     .orElseThrow(() -> new AuthenticationException("Usuario no encontrado"));
 
-            String token = jwtTokenService.generateToken(user);
+            String token = jwtTokenService.generateToken(users);
 
             return LoginResponseDTO.builder()
                     .message("Autenticación exitosa")
                     .token(token)
-                    .email(user.getEmail())
-                    .userId(user.getId())
-                    .userType(user.getUserType().getId())
+                    .email(users.getEmail())
+                    .userId(users.getId())
+                    .userType(users.getUserType().getId())
                     .success(true)
                     .build();
         } catch (Exception e) {
