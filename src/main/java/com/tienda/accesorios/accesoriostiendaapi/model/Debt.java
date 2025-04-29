@@ -1,9 +1,6 @@
 package com.tienda.accesorios.accesoriostiendaapi.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "debt")
@@ -18,14 +15,15 @@ public class Debt {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "debtaomunt", nullable = false)
-    private Double debtaomunt;
+    @Column(name = "debtamount", nullable = false)
+    private Double debtamount;
 
     @Column(name = "ispaid", nullable = false)
     private boolean isPaid;
 
-    @Column(name = "debttype_id", nullable = false)
-    private Integer debttype_id;
+    @ManyToOne
+    @JoinColumn(name = "debttype_id", nullable = false)
+    private DebtType debttype;
 
     public Integer getId() {
         return id;
@@ -51,12 +49,12 @@ public class Debt {
         this.description = description;
     }
 
-    public Double getDebtaomunt() {
-        return debtaomunt;
+    public Double getDebtamount() {
+        return debtamount;
     }
 
-    public void setDebtaomunt(Double debtaomunt) {
-        this.debtaomunt = debtaomunt;
+    public void setDebtamount(Double debtamount) {
+        this.debtamount = debtamount;
     }
 
     public boolean isPaid() {
@@ -67,11 +65,11 @@ public class Debt {
         isPaid = paid;
     }
 
-    public Integer getDebttype_id() {
-        return debttype_id;
+    public DebtType getDebttype() {
+        return debttype;
     }
 
-    public void setDebttype_id(Integer debttype_id) {
-        this.debttype_id = debttype_id;
+    public void setDebttype(DebtType debttype) {
+        this.debttype = debttype;
     }
 }

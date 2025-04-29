@@ -12,12 +12,11 @@ import java.util.Date;
 public class UserProfile {
     @Id
     @Column(name = "user_id")
-    private String userId;
+    private String userId;  // Este campo actúa como clave primaria
 
     @OneToOne
-    @MapsId
     @JoinColumn(name = "user_id")
-    private Users users;
+    private Users user;
 
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
@@ -46,12 +45,12 @@ public class UserProfile {
         this.userId = userId;
     }
 
-    public Users getUsers() {
-        return users;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUsers(Users users) {
-        this.users = users;
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public String getAvatarUrl() {
@@ -78,12 +77,12 @@ public class UserProfile {
         this.birthDate = birthDate;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public String getGender() {
+        return gender;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -94,12 +93,12 @@ public class UserProfile {
         this.createdAt = createdAt;
     }
 
-    public String getGender() {
-        return gender;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
 
