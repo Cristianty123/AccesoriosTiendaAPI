@@ -14,6 +14,7 @@ import com.tienda.accesorios.accesoriostiendaapi.repository.ItemAdditionalExpens
 import com.tienda.accesorios.accesoriostiendaapi.repository.ItemRepository;
 import com.tienda.accesorios.accesoriostiendaapi.exception.NoItemsFoundException;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -111,14 +112,42 @@ public class ItemService {
         }
         return convertToItemResponse(savedItem);
     }
-    public ItemPageResponse getItemsByPage(int pageNumber, Optional<String> itemTypeId) {
+    public ItemPageResponse getItemsByPage(int pageNumber,Optional<String> search, Optional<String> itemTypeId, Optional<Integer> minStock, Optional<Integer> maxStock) {
         int pageSize = 6;
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("createdAt").descending());
 
-        Page<Item> itemsPage = itemTypeId
-                .map(id -> itemRepository.findAllByItemtypeIdOrderByCreatedAtDesc(id, pageable))
-                .orElseGet(() -> itemRepository.findAllByOrderByCreatedAtDesc(pageable));
+        Specification<Item> spec = Specification.where(null);
 
+        // Filtro por búsqueda
+        if (search.isPresent() && !search.get().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("name")), "%" + search.get().toLowerCase() + "%"),
+                            cb.like(cb.lower(root.get("description")), "%" + search.get().toLowerCase() + "%")
+                    )
+            );
+        }
+
+        // Filtro por tipo
+        if (itemTypeId.isPresent() && !itemTypeId.get().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("itemtype").get("id"), itemTypeId.get())
+            );
+        }
+
+        // Filtro por stock
+        if (minStock.isPresent()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("stock"), minStock.get())
+            );
+        }
+        if (maxStock.isPresent()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("stock"), maxStock.get())
+            );
+        }
+
+        Page<Item> itemsPage = itemRepository.findAll(spec, pageable);
 
         if (itemsPage.isEmpty()) {
             throw new NoItemsFoundException("La página seleccionada no tiene items.");

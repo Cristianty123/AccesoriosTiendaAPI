@@ -143,9 +143,18 @@ public class ItemController {
     @GetMapping("/public/page")
     public ResponseEntity<ItemPageResponse> getItemsByPage(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(required = false) String itemTypeId) {
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String itemTypeId,
+            @RequestParam(required = false) Integer minStock,
+            @RequestParam(required = false) Integer maxStock) {
 
-        ItemPageResponse response = itemService.getItemsByPage(page, Optional.ofNullable(itemTypeId));
+        ItemPageResponse response = itemService.getItemsByPage(
+                page,
+                Optional.ofNullable(search),
+                Optional.ofNullable(itemTypeId),
+                Optional.ofNullable(minStock),
+                Optional.ofNullable(maxStock)
+        );
         return ResponseEntity.ok(response);
     }
 }
