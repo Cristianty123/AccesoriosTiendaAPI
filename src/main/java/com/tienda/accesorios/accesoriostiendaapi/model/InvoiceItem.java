@@ -19,25 +19,13 @@ public class InvoiceItem {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    @Column(nullable = false)
-    private Integer quantity;
-
-    @Column(nullable = false)
-    private Double unit_price;
-
-    @Column(nullable = false)
-    private Double subtotal;
-
     // --- Constructores ---
     public InvoiceItem() {
     }
 
-    public InvoiceItem(Invoice invoice, Item item, Integer quantity, Double unitPrice, Double subtotal) {
+    public InvoiceItem(Invoice invoice, Item item) {
         this.invoice = invoice;
         this.item = item;
-        this.quantity = quantity;
-        this.unit_price = unitPrice;
-        this.subtotal = subtotal;
         this.id = new InvoiceItemId(invoice.getId(), item.getId());
     }
 
@@ -65,27 +53,4 @@ public class InvoiceItem {
         this.item = item;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Double getUnit_price() {
-        return unit_price;
-    }
-
-    public void setUnit_price(Double unit_price) {
-        this.unit_price = unit_price;
-    }
-
-    public Double getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = subtotal;
-    }
 }
