@@ -2,6 +2,7 @@ package com.tienda.accesorios.accesoriostiendaapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tienda.accesorios.accesoriostiendaapi.dto.InvoiceResponse;
+import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.model.Invoice;
 import com.tienda.accesorios.accesoriostiendaapi.model.PurchaseOrder;
 import com.tienda.accesorios.accesoriostiendaapi.repository.PurchaseOrderRepository;
@@ -19,7 +20,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/facturas")
-@PreAuthorize("hasRole('SYSTEM_ADMIN')")
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
@@ -32,7 +32,7 @@ public class InvoiceController {
     }
 
     // Obtener todas las facturas con filtros opcionales
-    @GetMapping
+    @GetMapping(("/getInvoice"))
     public ResponseEntity<List<InvoiceResponse>> obtenerFacturas(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) Long clienteId,
@@ -88,4 +88,5 @@ public class InvoiceController {
         Invoice factura = invoiceService.generarFacturaDesdeOrden(orderId);
         return ResponseEntity.ok(factura);
     }
+
 }

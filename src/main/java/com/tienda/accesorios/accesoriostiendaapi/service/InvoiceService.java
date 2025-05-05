@@ -2,18 +2,28 @@ package com.tienda.accesorios.accesoriostiendaapi.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienda.accesorios.accesoriostiendaapi.dto.InvoicePageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.InvoiceResponse;
+import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
+import com.tienda.accesorios.accesoriostiendaapi.exception.NoInvoicesFoundException;
 import com.tienda.accesorios.accesoriostiendaapi.model.Invoice;
 import com.tienda.accesorios.accesoriostiendaapi.model.PurchaseOrder;
 import com.tienda.accesorios.accesoriostiendaapi.repository.InvoiceRepository;
 
 import com.tienda.accesorios.accesoriostiendaapi.repository.PurchaseOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -179,4 +189,118 @@ public class InvoiceService {
                 " - Factura ID: " + factura.getId());
     }
 
+    public InvoicePageResponse getInvoicesByPage(
+            int pageNumber,
+            Optional<String> search,
+            Optional<String> status,
+            Optional<Long> customerId,
+            Optional<LocalDate> dateFrom,
+            Optional<LocalDate> dateTo) {
+
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("createdAt").descending());
+
+        Specification<Invoice> spec = Specification.where(null);
+
+        // Búsqueda por número o nombre de cliente
+        if (search.isPresent() && !search.get().isBlank()) {
+            String searchTerm = "%" + search.get().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("invoiceNumber").as(String.class)), searchTerm),
+                    cb.like(cb.lower(root.get("customer").get("name")), searchTerm)
+            ));
+        }
+
+        // Estado
+        if (status.isPresent() && !status.get().equalsIgnoreCase("all")) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("status"), status.get())
+            );
+        }
+
+        // Cliente
+        if (customerId.isPresent()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("customer").get("id"), customerId.get())
+            );
+        }
+
+        // Fecha desde
+        if (dateFrom.isPresent()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("createdAt").as(LocalDate.class), dateFrom.get())
+            );
+        }
+
+        // Fecha hasta
+        if (dateTo.isPresent()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("createdAt").as(LocalDate.class), dateTo.get())
+            );
+        }
+
+        Page<Invoice> invoicePage = invoiceRepository.findAll(spec, pageable);
+
+        if (invoicePage.isEmpty()) {
+            throw new NoInvoicesFoundException("No se encontraron facturas para la página seleccionada.");
+        }
+
+        List<InvoiceResponse> invoices = invoicePage.stream()
+                .map(invoice -> {
+                    // Manejo de campos que podrían ser null
+                    String clienteNombre = invoice.getCustomer() != null
+                            ? invoice.getCustomer().getCustomername()
+                            : "Cliente no disponible";
+                    String estado = invoice.getOrder() != null
+                            ? invoice.getOrder().getEstado().toString()
+                            : "Estado no disponible";
+
+                    return InvoiceResponse.builder()
+                            .id(invoice.getId())
+                            .fecha(invoice.getDatetime())
+                            .clienteNombre(clienteNombre)
+                            .total(invoice.getTotal())
+                            .estado(estado)
+                            .build();
+                })
+                .toList();
+
+        List<String> pagesToShow = calculatePagesToShow(invoicePage.getTotalPages(), pageNumber);
+
+        return new InvoicePageResponse(invoicePage.getTotalPages(), pageNumber, pagesToShow, invoices);
+    }
+
+    private List<String> calculatePagesToShow(int totalPages, int currentPage) {
+        List<String> pages = new ArrayList<>();
+
+        if (totalPages <= 13) {
+            for (int i = 1; i <= totalPages; i++) {
+                pages.add(String.valueOf(i));
+            }
+            return pages;
+        }
+
+        pages.add("1");
+        pages.add("2");
+
+        if (currentPage > 5) {
+            pages.add("...");
+        }
+
+        int start = Math.max(3, currentPage - 3);
+        int end = Math.min(totalPages - 2, currentPage + 3);
+
+        for (int i = start; i <= end; i++) {
+            pages.add(String.valueOf(i));
+        }
+
+        if (currentPage < totalPages - 4) {
+            pages.add("...");
+        }
+
+        pages.add(String.valueOf(totalPages - 1));
+        pages.add(String.valueOf(totalPages));
+
+        return pages;
+    }
 }

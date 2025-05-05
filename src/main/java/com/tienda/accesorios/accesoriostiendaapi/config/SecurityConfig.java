@@ -50,6 +50,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
 
                     auth.requestMatchers(
+                            "/api/facturas/**",
                             "/items/public/**",
                             "/additionalExpenses/**",
                             "/uploads/**",
