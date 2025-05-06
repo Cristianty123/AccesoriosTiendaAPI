@@ -13,6 +13,6 @@ import java.util.Optional;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     Optional<Invoice> findById(Integer id);
-
+    Page<Invoice> findAll(Pageable pageable);
     Page<Invoice> findAll(Specification<Invoice> spec, Pageable pageable);
 }

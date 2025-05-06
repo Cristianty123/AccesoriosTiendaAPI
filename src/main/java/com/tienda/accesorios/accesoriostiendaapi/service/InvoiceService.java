@@ -189,57 +189,11 @@ public class InvoiceService {
                 " - Factura ID: " + factura.getId());
     }
 
-    public InvoicePageResponse getInvoicesByPage(
-            int pageNumber,
-            Optional<String> search,
-            Optional<String> status,
-            Optional<Long> customerId,
-            Optional<LocalDate> dateFrom,
-            Optional<LocalDate> dateTo) {
+    public InvoicePageResponse getInvoicesByPage(int pageNumber) {
+        int pageSize = 6;
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("datetime").descending());
 
-        int pageSize = 10;
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by("createdAt").descending());
-
-        Specification<Invoice> spec = Specification.where(null);
-
-        // Búsqueda por número o nombre de cliente
-        if (search.isPresent() && !search.get().isBlank()) {
-            String searchTerm = "%" + search.get().toLowerCase() + "%";
-            spec = spec.and((root, query, cb) -> cb.or(
-                    cb.like(cb.lower(root.get("invoiceNumber").as(String.class)), searchTerm),
-                    cb.like(cb.lower(root.get("customer").get("name")), searchTerm)
-            ));
-        }
-
-        // Estado
-        if (status.isPresent() && !status.get().equalsIgnoreCase("all")) {
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("status"), status.get())
-            );
-        }
-
-        // Cliente
-        if (customerId.isPresent()) {
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("customer").get("id"), customerId.get())
-            );
-        }
-
-        // Fecha desde
-        if (dateFrom.isPresent()) {
-            spec = spec.and((root, query, cb) ->
-                    cb.greaterThanOrEqualTo(root.get("createdAt").as(LocalDate.class), dateFrom.get())
-            );
-        }
-
-        // Fecha hasta
-        if (dateTo.isPresent()) {
-            spec = spec.and((root, query, cb) ->
-                    cb.lessThanOrEqualTo(root.get("createdAt").as(LocalDate.class), dateTo.get())
-            );
-        }
-
-        Page<Invoice> invoicePage = invoiceRepository.findAll(spec, pageable);
+        Page<Invoice> invoicePage = invoiceRepository.findAll(pageable);
 
         if (invoicePage.isEmpty()) {
             throw new NoInvoicesFoundException("No se encontraron facturas para la página seleccionada.");
@@ -251,6 +205,7 @@ public class InvoiceService {
                     String clienteNombre = invoice.getCustomer() != null
                             ? invoice.getCustomer().getCustomername()
                             : "Cliente no disponible";
+
                     String estado = invoice.getOrder() != null
                             ? invoice.getOrder().getEstado().toString()
                             : "Estado no disponible";
@@ -267,7 +222,12 @@ public class InvoiceService {
 
         List<String> pagesToShow = calculatePagesToShow(invoicePage.getTotalPages(), pageNumber);
 
-        return new InvoicePageResponse(invoicePage.getTotalPages(), pageNumber, pagesToShow, invoices);
+        return new InvoicePageResponse(
+                invoicePage.getTotalPages(),
+                pageNumber,
+                pagesToShow,
+                invoices
+        );
     }
 
     private List<String> calculatePagesToShow(int totalPages, int currentPage) {

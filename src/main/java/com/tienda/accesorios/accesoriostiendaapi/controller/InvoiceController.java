@@ -1,6 +1,7 @@
 package com.tienda.accesorios.accesoriostiendaapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienda.accesorios.accesoriostiendaapi.dto.InvoicePageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.InvoiceResponse;
 import com.tienda.accesorios.accesoriostiendaapi.dto.ItemPageResponse;
 import com.tienda.accesorios.accesoriostiendaapi.model.Invoice;
@@ -32,20 +33,12 @@ public class InvoiceController {
     }
 
     // Obtener todas las facturas con filtros opcionales
-    @GetMapping(("/getInvoice"))
-    public ResponseEntity<List<InvoiceResponse>> obtenerFacturas(
-            @RequestParam(required = false) String estado,
-            @RequestParam(required = false) Long clienteId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaHasta,
-            @RequestParam(required = false) String buscar,
-            @RequestParam(defaultValue = "0") int pagina,
-            @RequestParam(defaultValue = "10") int tamaño) {
+    @GetMapping("/getInvoice/page")
+    public ResponseEntity<InvoicePageResponse> obtenerFacturas(
+            @RequestParam(defaultValue = "1") int page) {
 
-        List<InvoiceResponse> facturas = invoiceService.obtenerFacturas(
-                estado, clienteId, fechaDesde, fechaHasta, buscar, pagina, tamaño
-        );
-        return ResponseEntity.ok(facturas);
+        InvoicePageResponse response = invoiceService.getInvoicesByPage(page);
+        return ResponseEntity.ok(response);
     }
 
     // Obtener una factura por su ID

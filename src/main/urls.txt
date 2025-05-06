@@ -1,2 +1,4 @@
 --Obtener pages typeitem
 http://localhost:8080/items/public/page?page=1&itemTypeId=abc123
+
+http://localhost:8080/api/facturas/getInvoice/page?page=1
